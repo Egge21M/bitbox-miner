@@ -31,7 +31,7 @@ function App() {
     setPhase("building");
   }
   useEffect(() => {
-    let interval;
+    let interval: ReturnType<typeof setInterval>;
     if (isRunning) {
       interval = setInterval(() => {
         if (time === 1) {

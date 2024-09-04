@@ -1,15 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import GameOverBanner from "./GameOverBanner";
 import { useLeaderboard } from "./hooks/useLeaderboard";
 import { getPlacement } from "./utils";
+import { LeaderboardEntry } from "./types";
 
-function EndScreen({ totalBitcoin, reset }) {
+type EndScreenProps = { totalBitcoin: number; reset: () => void };
+
+function EndScreen({ totalBitcoin, reset }: EndScreenProps) {
   const [showLeaderboard, setShowLeaderBoard] = useState(false);
   const { leaderboard, setLeaderboard } = useLeaderboard();
   const placement = useMemo(() => {
     return getPlacement(totalBitcoin, leaderboard);
   }, []);
-  console.log("placement: ", placement);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,9 +44,11 @@ function EndScreen({ totalBitcoin, reset }) {
         <h1 className="text-3xl mt-6">Leaderboard</h1>
         <ol className="w-full flex flex-col items-center justify-center">
           {leaderboard
-            .sort((a, b) => b.score - a.score)
+            .sort(
+              (a: LeaderboardEntry, b: LeaderboardEntry) => b.score - a.score,
+            )
             .slice(0, 10)
-            .map((e, i) => (
+            .map((e: LeaderboardEntry, i: number) => (
               <li
                 className={`w-2/3 flex justify-between ${placement === i + 1 ? "text-orange-500" : ""} gap-2`}
               >

@@ -1,5 +1,3 @@
-import React from "react";
-
 function GameOverBanner() {
   return (
     <pre className="flex items-center gap-8">

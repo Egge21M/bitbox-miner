@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { randomHexStrings } from "./main";
 
 const max = 500;
 
-function Miner({ submitBlock }) {
+type MinerProps = {
+  submitBlock: () => void;
+};
+
+function Miner({ submitBlock }: MinerProps) {
   const [presses, setPresses] = useState(0);
   const [hashes, setHashes] = useState<string[]>([]);
   const progress = (Math.fround(presses / max) * 100).toFixed();
@@ -19,7 +23,7 @@ function Miner({ submitBlock }) {
   }, []);
 
   useEffect(() => {
-    setHashes((p) => [...p, randomHexStrings[progress]]);
+    setHashes((p) => [...p, randomHexStrings[parseInt(progress)]]);
   }, [progress]);
 
   if (Number(progress) >= 100) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   getColor,
   getRandomFee,
@@ -8,9 +8,9 @@ import {
 } from "./utils";
 
 type BlockBuilderProps = {
-  value: any;
-  setValue: any;
-  setPhase: any;
+  value: number;
+  setValue: Dispatch<SetStateAction<number>>;
+  setPhase: Dispatch<SetStateAction<"mining" | "start" | "end" | "building">>;
 };
 
 function BlockBuilder({ value, setValue, setPhase }: BlockBuilderProps) {
