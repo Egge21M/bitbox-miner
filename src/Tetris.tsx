@@ -138,6 +138,11 @@ function Tetris() {
         }
       });
     });
+    newBoard[0].forEach((slot: number) => {
+      if (slot) {
+        alert("Done");
+      }
+    });
 
     setBoard(newBoard);
   };

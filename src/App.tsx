@@ -1,35 +1,20 @@
 import { useEffect, useState } from "react";
-import Miner from "./Miner";
-import StatusBar from "./Statusbar";
 import EndScreen from "./EndScreen";
 import StartImage from "./StartImage";
 import Tetris from "./Tetris";
 
-const initialTime = 60;
-
-let time = initialTime;
-
 function App() {
-  const [pendingValue, setPendingValue] = useState(0);
   const [minedValue, setMinedValue] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [phase, setPhase] = useState<"start" | "building" | "mining" | "end">(
     "start",
   );
-  const [secondsLeft, setSecondsLeft] = useState(time);
 
   function reset() {
-    time = initialTime;
-    setSecondsLeft(5);
     setMinedValue(0);
     setPhase("start");
   }
 
-  function submitBlock() {
-    setMinedValue((p) => p + pendingValue + 312500000);
-    setPendingValue(0);
-    setPhase("building");
-  }
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     return () => {
