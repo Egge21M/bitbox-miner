@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import BlockBuilder from "./BlockBuilder";
 import Miner from "./Miner";
 import StatusBar from "./Statusbar";
 import EndScreen from "./EndScreen";

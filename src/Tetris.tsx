@@ -1,4 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type ShapeMatrix = number[][];
+type Shape = { number: number; shape: ShapeMatrix };
 
 const rows = 20;
 const columns = 10;
@@ -46,7 +49,7 @@ const shapes = [
   { number: 7, shape: L_SHAPE },
 ];
 
-const rotateClockwise = (shape) => {
+const rotateClockwise = (shape: ShapeMatrix) => {
   const rows = shape.length;
   const columns = shape[0].length;
 
@@ -82,7 +85,7 @@ function Tetris() {
     boardRef.current = board;
   }, [cursorX, cursorY, shape, board]);
 
-  const checkMove = (shapeObj, cursorX, cursorY) => {
+  const checkMove = (shapeObj: Shape, cursorX: number, cursorY: number) => {
     const shape = shapeObj.shape;
     const shapeHeight = shape.length;
     const shapeWidth = shape[0].length;
@@ -111,7 +114,11 @@ function Tetris() {
     return "valid";
   };
 
-  const lockShapeOnBoard = (shapeObj, cursorX, cursorY) => {
+  const lockShapeOnBoard = (
+    shapeObj: Shape,
+    cursorX: number,
+    cursorY: number,
+  ) => {
     const shape = shapeObj.shape;
     const newBoard = boardRef.current.map((row) => row.slice());
 
@@ -132,7 +139,7 @@ function Tetris() {
       });
     });
 
-    newBoard[0].forEach((slot) => {
+    newBoard[0].forEach((slot: number) => {
       if (slot) {
         alert("Game ended");
       }
@@ -184,7 +191,7 @@ function Tetris() {
             }
           });
           break;
-        case "ArrowUp":
+        case "ArrowUp": {
           const rotatedShape = rotateClockwise(shapeRef.current.shape);
           const currentShape = { ...shapeRef.current, shape: rotatedShape };
 
@@ -195,13 +202,14 @@ function Tetris() {
             setShape(currentShape);
           }
           break;
+        }
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [cursorY, shape]);
+  }, [cursorY, shape, checkMove]);
 
   useEffect(() => {
     const interval = setInterval(() => {
