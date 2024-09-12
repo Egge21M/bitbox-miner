@@ -4,6 +4,7 @@ import Miner from "./Miner";
 import StatusBar from "./Statusbar";
 import EndScreen from "./EndScreen";
 import StartImage from "./StartImage";
+import Tetris from "./Tetris";
 
 const initialTime = 60;
 
@@ -32,17 +33,6 @@ function App() {
   }
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
-    if (isRunning) {
-      interval = setInterval(() => {
-        if (time === 1) {
-          setIsRunning(false);
-          setPhase("end");
-          return;
-        }
-        time = time - 1;
-        setSecondsLeft(time);
-      }, 1000);
-    }
     return () => {
       if (interval) {
         clearInterval(interval);
@@ -84,11 +74,12 @@ function App() {
             return <Miner submitBlock={submitBlock} />;
           }
           return (
-            <BlockBuilder
-              value={pendingValue}
-              setValue={setPendingValue}
-              setPhase={setPhase}
-            />
+            // <BlockBuilder
+            //   value={pendingValue}
+            //   setValue={setPendingValue}
+            //   setPhase={setPhase}
+            // />
+            <Tetris />
           );
         })()}
       </div>
