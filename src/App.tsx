@@ -66,21 +66,8 @@ function App() {
   }
   return (
     <div className="w-full h-full flex flex-col items-center">
-      <StatusBar timeLeft={secondsLeft} coinsCollected={minedValue} />
-      <div className="grow w-full flex flex-col justify-center items-center">
-        {(() => {
-          if (phase === "mining") {
-            return <Miner submitBlock={submitBlock} />;
-          }
-          return (
-            // <BlockBuilder
-            //   value={pendingValue}
-            //   setValue={setPendingValue}
-            //   setPhase={setPhase}
-            // />
-            <Tetris />
-          );
-        })()}
+      <div className="h-full w-full flex flex-col overflow-hidden ">
+        <Tetris />
       </div>
     </div>
   );

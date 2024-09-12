@@ -139,12 +139,6 @@ function Tetris() {
       });
     });
 
-    newBoard[0].forEach((slot: number) => {
-      if (slot) {
-        alert("Game ended");
-      }
-    });
-
     setBoard(newBoard);
   };
 
@@ -237,41 +231,44 @@ function Tetris() {
   });
 
   return (
-    <div className="flex flex-col gap-1 h-1/2 w-1/2">
+    <div className="flex flex-col gap-1 max-h-[50%] w-full min-h-0">
       {Array(rows)
         .fill(0)
         .map((_, i) => {
           return (
-            <div className="flex gap-2">
+            <div className="flex gap-2 grow basis-0">
               {Array(columns)
                 .fill(0)
                 .map((_, j) => {
-                  if (combinedBoard[i][j] === 2) {
-                    return <div className="bg-purple-500 h-4 w-4"></div>;
-                  }
-                  if (combinedBoard[i][j] === 3) {
-                    return <div className="bg-green-500 h-4 w-4"></div>;
-                  }
-                  if (combinedBoard[i][j] === 4) {
-                    return <div className="bg-sky-500 h-4 w-4"></div>;
-                  }
-                  if (combinedBoard[i][j] === 5) {
-                    return <div className="bg-yellow-500 h-4 w-4"></div>;
-                  }
-                  if (combinedBoard[i][j] === 6) {
-                    return <div className="bg-red-500 h-4 w-4"></div>;
-                  }
-                  if (combinedBoard[i][j] === 7) {
-                    return <div className="bg-pink-500 h-4 w-4"></div>;
-                  }
-                  if (combinedBoard[i][j] === 8) {
-                    return <div className="bg-orange-500 h-4 w-4"></div>;
+                  let bgColor = "bg-zinc-50";
+                  switch (combinedBoard[i][j]) {
+                    case 2:
+                      bgColor = "bg-purple-500";
+                      break;
+                    case 3:
+                      bgColor = "bg-green-500";
+                      break;
+                    case 4:
+                      bgColor = "bg-sky-500";
+                      break;
+                    case 5:
+                      bgColor = "bg-yellow-500";
+                      break;
+                    case 6:
+                      bgColor = "bg-red-500";
+                      break;
+                    case 7:
+                      bgColor = "bg-pink-500";
+                      break;
+                    case 8:
+                      bgColor = "bg-orange-500";
+                      break;
+                    case 1:
+                      bgColor = "bg-red-300";
+                      break;
                   }
 
-                  if (combinedBoard[i][j] === 1) {
-                    return <div className="bg-red-200 h-4 w-4"></div>;
-                  }
-                  return <div className="bg-red-50 h-4 w-4"></div>;
+                  return <div className={`${bgColor} h-[3vh] w-[3vh]`}></div>;
                 })}
             </div>
           );
