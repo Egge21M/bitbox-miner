@@ -56,6 +56,13 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+#bbSvg {
+  background-image: url(/Element\ 1.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

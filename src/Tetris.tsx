@@ -1,53 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { feeRate, newgrid, shapes, weigthPerBlock } from "./constants";
 
 type ShapeMatrix = number[][];
 type Shape = { number: number; shape: ShapeMatrix };
-
-const rows = 20;
-const columns = 10;
-const newgrid = Array(20).fill(Array(10).fill(0));
-
-const I_SHAPE = [[1, 1, 1, 1]];
-
-const O_SHAPE = [
-  [1, 1],
-  [1, 1],
-];
-
-const T_SHAPE = [
-  [0, 1, 0],
-  [1, 1, 1],
-];
-
-const S_SHAPE = [
-  [0, 1, 1],
-  [1, 1, 0],
-];
-
-const Z_SHAPE = [
-  [1, 1, 0],
-  [0, 1, 1],
-];
-
-const J_SHAPE = [
-  [1, 0, 0],
-  [1, 1, 1],
-];
-
-const L_SHAPE = [
-  [0, 0, 1],
-  [1, 1, 1],
-];
-
-const shapes = [
-  { number: 8, shape: I_SHAPE },
-  { number: 2, shape: O_SHAPE },
-  { number: 3, shape: T_SHAPE },
-  { number: 4, shape: S_SHAPE },
-  { number: 5, shape: Z_SHAPE },
-  { number: 6, shape: J_SHAPE },
-  { number: 7, shape: L_SHAPE },
-];
 
 const rotateClockwise = (shape: ShapeMatrix) => {
   const rows = shape.length;
@@ -66,12 +28,22 @@ const rotateClockwise = (shape: ShapeMatrix) => {
   return rotatedShape;
 };
 
-function Tetris() {
+type TetrisProps = {
+  minedValue: number;
+  setMinedValue: Dispatch<SetStateAction<number>>;
+  endGame: () => void;
+};
+
+function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
   const [board, setBoard] = useState(newgrid);
-  const [shape, setShape] = useState(shapes[0]);
+  const [shape, setShape] = useState(
+    () => shapes[Math.round(Math.random() * shapes.length - 1)],
+  );
   const [cursorX, setCursorX] = useState(4);
   const [cursorY, setCursorY] = useState(0);
+  const [round, setRound] = useState(1);
   const combinedBoard = [...board.map((row) => [...row])];
+  const [weight, setWeight] = useState(0);
 
   const cursorXRef = useRef(cursorX);
   const cursorYRef = useRef(cursorY);
@@ -121,10 +93,12 @@ function Tetris() {
   ) => {
     const shape = shapeObj.shape;
     const newBoard = boardRef.current.map((row) => row.slice());
+    let points = 0;
 
     shape.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
+          points++;
           const boardX = cursorX + x;
           const boardY = cursorY + y;
           if (
@@ -140,9 +114,12 @@ function Tetris() {
     });
     newBoard[0].forEach((slot: number) => {
       if (slot) {
-        alert("Done");
+        endGame();
       }
     });
+    const blockValue = points * weigthPerBlock * feeRate;
+    setMinedValue((p) => p + blockValue);
+    setWeight((p) => p + 2);
 
     setBoard(newBoard);
   };
@@ -162,6 +139,7 @@ function Tetris() {
       setCursorY(0);
       setCursorX(4);
       setShape(shapes[Math.round(Math.random() * (shapes.length - 1))]);
+      setRound((p) => p + 1);
     }
   }, []);
 
@@ -211,12 +189,21 @@ function Tetris() {
   }, [cursorY, shape, checkMove]);
 
   useEffect(() => {
+    let time;
+    if (round < 5) {
+      time = 300;
+    } else if (round < 10) {
+      time = 250;
+    } else {
+      time = 200;
+    }
+
     const interval = setInterval(() => {
       moveShapeDown();
-    }, 300);
+    }, time);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [round]);
 
   shape.shape.forEach((row, y) => {
     row.forEach((value, x) => {
@@ -236,50 +223,62 @@ function Tetris() {
   });
 
   return (
-    <div className="flex flex-col gap-1 max-h-[50%] w-full min-h-0">
-      {Array(rows)
-        .fill(0)
-        .map((_, i) => {
-          return (
-            <div className="flex gap-2 grow basis-0">
-              {Array(columns)
-                .fill(0)
-                .map((_, j) => {
-                  let bgColor = "bg-zinc-50";
-                  switch (combinedBoard[i][j]) {
-                    case 2:
-                      bgColor = "bg-purple-500";
-                      break;
-                    case 3:
-                      bgColor = "bg-green-500";
-                      break;
-                    case 4:
-                      bgColor = "bg-sky-500";
-                      break;
-                    case 5:
-                      bgColor = "bg-yellow-500";
-                      break;
-                    case 6:
-                      bgColor = "bg-red-500";
-                      break;
-                    case 7:
-                      bgColor = "bg-pink-500";
-                      break;
-                    case 8:
-                      bgColor = "bg-orange-500";
-                      break;
-                    case 1:
-                      bgColor = "bg-red-300";
-                      break;
-                  }
+    <div className="w-full h-full flex gap-2">
+      <div className="flex flex-col items-center p-4">
+        <div className="h-[10%] w-[33%] bg-zinc-400 rounded-t"></div>
+        <div className="flex w-full h-[90%] bg-zinc-800 rounded-xl p-4">
+          <div className="grid grid-cols-10 grid-rows-20 gap-0.5 ">
+            {Array(20)
+              .fill(0)
+              .map((_, rowIndex) =>
+                Array(10)
+                  .fill(0)
+                  .map((_, colIndex) => {
+                    let bgColor = "bg-zinc-900";
+                    switch (combinedBoard[rowIndex][colIndex]) {
+                      case 2:
+                        bgColor = "bg-purple-500";
+                        break;
+                      case 3:
+                        bgColor = "bg-green-500";
+                        break;
+                      case 4:
+                        bgColor = "bg-sky-500";
+                        break;
+                      case 5:
+                        bgColor = "bg-yellow-500";
+                        break;
+                      case 6:
+                        bgColor = "bg-red-500";
+                        break;
+                      case 7:
+                        bgColor = "bg-pink-500";
+                        break;
+                      case 8:
+                        bgColor = "bg-orange-500";
+                        break;
+                      case 1:
+                        bgColor = "bg-zinc-300";
+                        break;
+                    }
 
-                  return <div className={`${bgColor} h-[3vh] w-[3vh]`}></div>;
-                })}
-            </div>
-          );
-        })}
+                    return (
+                      <div
+                        key={`${rowIndex}-${colIndex}`}
+                        className={`${bgColor} aspect-square`}
+                      ></div>
+                    );
+                  }),
+              )}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 justify-center text-left text-sm">
+        <p>Current Fee Rate: 16 sats / vByte</p>
+        <p>Block Size: {(weight * 10000) / 1000000} vMB</p>
+        <p>Block Value: {minedValue / 100000000} Bitcoin</p>
+      </div>
     </div>
   );
 }
-
 export default Tetris;

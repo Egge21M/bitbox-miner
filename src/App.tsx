@@ -10,6 +10,10 @@ function App() {
     "start",
   );
 
+  function endGame() {
+    setPhase("end");
+  }
+
   function reset() {
     setMinedValue(0);
     setPhase("start");
@@ -50,11 +54,11 @@ function App() {
     );
   }
   return (
-    <div className="w-full h-full flex flex-col items-center">
-      <div className="h-full w-full flex flex-col overflow-hidden ">
-        <Tetris />
-      </div>
-    </div>
+    <Tetris
+      setMinedValue={setMinedValue}
+      minedValue={minedValue}
+      endGame={endGame}
+    />
   );
 }
 
