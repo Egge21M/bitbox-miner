@@ -37,7 +37,7 @@ type TetrisProps = {
 function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
   const [board, setBoard] = useState(newgrid);
   const [shape, setShape] = useState(
-    () => shapes[Math.round(Math.random() * shapes.length - 1)],
+    () => shapes[Math.floor(Math.random() * shapes.length - 1)],
   );
   const [cursorX, setCursorX] = useState(4);
   const [cursorY, setCursorY] = useState(0);
@@ -138,7 +138,7 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
       );
       setCursorY(0);
       setCursorX(4);
-      setShape(shapes[Math.round(Math.random() * (shapes.length - 1))]);
+      setShape(shapes[Math.floor(Math.random() * (shapes.length - 1))]);
       setRound((p) => p + 1);
     }
   }, []);
@@ -149,7 +149,11 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
       switch (code) {
         case "ArrowLeft":
           setCursorX((p) => {
-            const check = checkMove(shape, p - 1, cursorY);
+            const check = checkMove(
+              shapeRef.current,
+              p - 1,
+              cursorYRef.current,
+            );
             if (check === "valid") {
               return p - 1;
             } else {
@@ -160,7 +164,11 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
 
         case "ArrowRight":
           setCursorX((p) => {
-            const check = checkMove(shape, p + 1, cursorY);
+            const check = checkMove(
+              shapeRef.current,
+              p + 1,
+              cursorYRef.current,
+            );
             if (check === "valid") {
               return p + 1;
             } else {
@@ -186,7 +194,7 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [cursorY, shape, checkMove]);
+  }, [checkMove]);
 
   useEffect(() => {
     let time;
