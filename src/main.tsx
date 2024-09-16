@@ -34,6 +34,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
+const gamepadButtonState: boolean[] = [];
+
 window.addEventListener("keydown", handleKeyDown);
 
 const pollGamepad = () => {
@@ -41,19 +43,37 @@ const pollGamepad = () => {
 
   if (gamepads[0]) {
     const gamepad = gamepads[0];
-    const leftPressed = gamepad.axes[0] < -0.5 || gamepad.buttons[14]?.pressed;
-    const rightPressed = gamepad.axes[0] > 0.5 || gamepad.buttons[15]?.pressed;
-    const bPressed = gamepad.buttons[0]?.pressed;
-    const aPressed = gamepad.buttons[1]?.pressed;
-    const startPressed = gamepad.buttons[9]?.pressed;
-    const downPressed = gamepad.axes[1] > 0.5 || gamepad.buttons[13]?.pressed;
+    gamepad.buttons.forEach((button, index) => {
+      const buttonPressed = button.pressed;
+
+      if (gamepadButtonState[index] === undefined) {
+        gamepadButtonState[index] = false;
+      }
+      if (buttonPressed && !gamepadButtonState[index]) {
+        switch (index) {
+          case 0:
+            emitGamepadEvent("b");
+            break;
+          case 1:
+            emitGamepadEvent("a");
+            break;
+          case 9:
+            emitGamepadEvent("start");
+            break;
+        }
+        gamepadButtonState[index] = true;
+      }
+      if (!buttonPressed && gamepadButtonState[index]) {
+        gamepadButtonState[index] = false;
+      }
+    });
+    const leftPressed = gamepad.axes[0] < -0.5;
+    const rightPressed = gamepad.axes[0] > 0.5;
+    const downPressed = gamepad.axes[1] > 0.5;
 
     if (leftPressed) emitGamepadEvent("left");
     if (rightPressed) emitGamepadEvent("right");
-    if (aPressed) emitGamepadEvent("a");
-    if (bPressed) emitGamepadEvent("b");
     if (downPressed) emitGamepadEvent("down");
-    if (startPressed) emitGamepadEvent("start");
   }
 
   requestAnimationFrame(pollGamepad);
