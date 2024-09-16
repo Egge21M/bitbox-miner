@@ -29,6 +29,23 @@ const rotateClockwise = (shape: ShapeMatrix) => {
   return rotatedShape;
 };
 
+const rotateCounterClockwise = (shape: ShapeMatrix) => {
+  const rows = shape.length;
+  const columns = shape[0].length;
+
+  const rotatedShape = Array(columns)
+    .fill(null)
+    .map(() => Array(rows).fill(0));
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      rotatedShape[columns - 1 - x][y] = shape[y][x];
+    }
+  }
+
+  return rotatedShape;
+};
+
 type TetrisProps = {
   minedValue: number;
   setMinedValue: Dispatch<SetStateAction<number>>;
@@ -211,6 +228,31 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
     }
   };
 
+  const handleRotateCounter = () => {
+    const rotatedShape = rotateCounterClockwise(shapeRef.current.shape);
+    const currentShape = { ...shapeRef.current, shape: rotatedShape };
+
+    const shapeWidth = rotatedShape[0].length;
+    const boardWidth = boardRef.current[0].length;
+
+    let adjustedCursorX = cursorXRef.current;
+
+    if (adjustedCursorX + shapeWidth > boardWidth) {
+      adjustedCursorX = boardWidth - shapeWidth;
+    }
+
+    if (adjustedCursorX < 0) {
+      adjustedCursorX = 0;
+    }
+
+    if (
+      checkMove(currentShape, adjustedCursorX, cursorYRef.current) === "valid"
+    ) {
+      setShape(currentShape);
+      setCursorX(adjustedCursorX);
+    }
+  };
+
   const pollGamepadInput = useCallback(() => {
     const gamepads = navigator.getGamepads();
     if (!gamepads) return;
@@ -220,7 +262,7 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
     if (gp) {
       const leftPressed = gp.axes[0] < -0.5 || gp.buttons[14]?.pressed;
       const rightPressed = gp.axes[0] > 0.5 || gp.buttons[15]?.pressed;
-      const rotatePressed = gp.buttons[0]?.pressed; // 'A' button
+      const rotatePressed = gp.buttons[0]?.pressed;
       const downPressed = gp.axes[1] > 0.5 || gp.buttons[13]?.pressed;
 
       if (leftPressed) handleMoveLeft();
@@ -239,26 +281,35 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
   }, [pollGamepadInput]);
 
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      const code = e.code;
+    function handleGamepadPressed(e: CustomEvent) {
+      const code = e.detail;
       switch (code) {
-        case "ArrowLeft":
+        case "left":
           handleMoveLeft();
           break;
-        case "ArrowRight":
+        case "right":
           handleMoveRight();
           break;
-        case "ArrowUp":
+        case "b":
+          handleRotateCounter();
+          break;
+        case "a":
           handleRotate();
           break;
-        case "ArrowDown":
+        case "down":
           moveShapeDown();
           break;
       }
     }
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "gamepad-pressed",
+      handleGamepadPressed as EventListener,
+    );
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleGamepadPressed as EventListener,
+      );
     };
   }, [moveShapeDown]);
 
