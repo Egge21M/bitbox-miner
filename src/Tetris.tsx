@@ -253,33 +253,6 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
     }
   };
 
-  const pollGamepadInput = useCallback(() => {
-    const gamepads = navigator.getGamepads();
-    if (!gamepads) return;
-
-    const gp = gamepads[0];
-
-    if (gp) {
-      const leftPressed = gp.axes[0] < -0.5 || gp.buttons[14]?.pressed;
-      const rightPressed = gp.axes[0] > 0.5 || gp.buttons[15]?.pressed;
-      const rotatePressed = gp.buttons[0]?.pressed;
-      const downPressed = gp.axes[1] > 0.5 || gp.buttons[13]?.pressed;
-
-      if (leftPressed) handleMoveLeft();
-      if (rightPressed) handleMoveRight();
-      if (rotatePressed) handleRotate();
-      if (downPressed) moveShapeDown();
-    }
-  }, [moveShapeDown]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      pollGamepadInput();
-    }, 100);
-
-    return () => clearInterval(intervalId);
-  }, [pollGamepadInput]);
-
   useEffect(() => {
     function handleGamepadPressed(e: CustomEvent) {
       const code = e.detail;
@@ -307,7 +280,7 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
     );
     return () => {
       window.removeEventListener(
-        "keydown",
+        "gamepad-pressed",
         handleGamepadPressed as EventListener,
       );
     };

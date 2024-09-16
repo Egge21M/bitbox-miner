@@ -79,9 +79,6 @@ function EndScreen({ totalBitcoin, reset }: EndScreenProps) {
           type="text"
           placeholder="Your Name..."
           autoFocus
-          onSubmit={() => {
-            console.log("Submitted!!");
-          }}
           ref={inputRef}
         />
         <button onClick={submitHander}>Submit</button>

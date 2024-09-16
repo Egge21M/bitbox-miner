@@ -42,6 +42,9 @@ const handleKeyDown = (e: KeyboardEvent) => {
     case "KeyA":
       emitGamepadEvent("b");
       break;
+    case "Enter":
+      emitGamepadEvent("start");
+      break;
     case "ArrowDown":
       emitGamepadEvent("down");
       break;
@@ -61,13 +64,15 @@ const pollGamepad = () => {
     const rightPressed = gamepad.axes[0] > 0.5 || gamepad.buttons[15]?.pressed;
     const bPressed = gamepad.buttons[0]?.pressed;
     const aPressed = gamepad.buttons[1]?.pressed;
+    const startPressed = gamepad.buttons[9]?.pressed;
     const downPressed = gamepad.axes[1] > 0.5 || gamepad.buttons[13]?.pressed;
 
-    if (leftPressed) emitGamepadEvent("gamepad-left");
-    if (rightPressed) emitGamepadEvent("gamepad-right");
-    if (aPressed) emitGamepadEvent("gamepad-a");
-    if (bPressed) emitGamepadEvent("gamepad-b");
-    if (downPressed) emitGamepadEvent("gamepad-down");
+    if (leftPressed) emitGamepadEvent("left");
+    if (rightPressed) emitGamepadEvent("right");
+    if (aPressed) emitGamepadEvent("a");
+    if (bPressed) emitGamepadEvent("b");
+    if (downPressed) emitGamepadEvent("down");
+    if (startPressed) emitGamepadEvent("start");
   }
 
   requestAnimationFrame(pollGamepad);

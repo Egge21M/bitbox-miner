@@ -29,17 +29,20 @@ function App() {
   }, [isRunning]);
 
   useEffect(() => {
-    function startHandler(e: KeyboardEvent) {
-      if (e.code === "Enter") {
+    function startHandler(e: CustomEvent) {
+      if (e.detail === "start") {
         setPhase("building");
         setIsRunning(true);
       }
     }
     if (phase === "start") {
-      window.addEventListener("keydown", startHandler);
+      window.addEventListener("gamepad-pressed", startHandler as EventListener);
     }
     return () => {
-      window.removeEventListener("keydown", startHandler);
+      window.removeEventListener(
+        "gamepad-pressed",
+        startHandler as EventListener,
+      );
     };
   }, [phase]);
   if (phase === "end") {
