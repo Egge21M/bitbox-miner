@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { feeRate, newgrid, shapes, weigthPerBlock } from "./constants";
+import { FaStar } from "react-icons/fa";
 
 type ShapeMatrix = number[][];
 type Shape = { number: number; shape: ShapeMatrix };
@@ -44,6 +45,26 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
   const [round, setRound] = useState(1);
   const combinedBoard = [...board.map((row) => [...row])];
   const [weight, setWeight] = useState(0);
+  const [boni, setBoni] = useState([false, false, false]);
+
+  useEffect(() => {
+    const blockSize = 10;
+    const totalBlocks = Math.floor(board.length / blockSize);
+
+    const result = [];
+
+    for (let blockIndex = 0; blockIndex < totalBlocks; blockIndex++) {
+      const block = board.slice(
+        blockIndex * blockSize,
+        (blockIndex + 1) * blockSize,
+      );
+      const isBlockFull = block.every((row) =>
+        row.every((cell: number) => cell !== 0),
+      );
+      result.push(isBlockFull);
+    }
+    setBoni(result.reverse());
+  }, [board]);
 
   const cursorXRef = useRef(cursorX);
   const cursorYRef = useRef(cursorY);
@@ -138,63 +159,108 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
       );
       setCursorY(0);
       setCursorX(4);
-      setShape(shapes[Math.floor(Math.random() * (shapes.length - 1))]);
       setRound((p) => p + 1);
+      setShape(shapes[Math.floor(Math.random() * (shapes.length - 1))]);
     }
   }, []);
+
+  const handleMoveLeft = () => {
+    setCursorX((p) => {
+      const check = checkMove(shapeRef.current, p - 1, cursorYRef.current);
+      if (check === "valid") {
+        return p - 1;
+      } else {
+        return p;
+      }
+    });
+  };
+
+  const handleMoveRight = () => {
+    setCursorX((p) => {
+      const check = checkMove(shapeRef.current, p + 1, cursorYRef.current);
+      if (check === "valid") {
+        return p + 1;
+      } else {
+        return p;
+      }
+    });
+  };
+
+  const handleRotate = () => {
+    const rotatedShape = rotateClockwise(shapeRef.current.shape);
+    const currentShape = { ...shapeRef.current, shape: rotatedShape };
+
+    const shapeWidth = rotatedShape[0].length;
+    const boardWidth = boardRef.current[0].length;
+
+    let adjustedCursorX = cursorXRef.current;
+
+    if (adjustedCursorX + shapeWidth > boardWidth) {
+      adjustedCursorX = boardWidth - shapeWidth;
+    }
+
+    if (adjustedCursorX < 0) {
+      adjustedCursorX = 0;
+    }
+
+    if (
+      checkMove(currentShape, adjustedCursorX, cursorYRef.current) === "valid"
+    ) {
+      setShape(currentShape);
+      setCursorX(adjustedCursorX);
+    }
+  };
+
+  const pollGamepadInput = useCallback(() => {
+    const gamepads = navigator.getGamepads();
+    if (!gamepads) return;
+
+    const gp = gamepads[0];
+
+    if (gp) {
+      const leftPressed = gp.axes[0] < -0.5 || gp.buttons[14]?.pressed;
+      const rightPressed = gp.axes[0] > 0.5 || gp.buttons[15]?.pressed;
+      const rotatePressed = gp.buttons[0]?.pressed; // 'A' button
+      const downPressed = gp.axes[1] > 0.5 || gp.buttons[13]?.pressed;
+
+      if (leftPressed) handleMoveLeft();
+      if (rightPressed) handleMoveRight();
+      if (rotatePressed) handleRotate();
+      if (downPressed) moveShapeDown();
+    }
+  }, [moveShapeDown]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      pollGamepadInput();
+    }, 100);
+
+    return () => clearInterval(intervalId);
+  }, [pollGamepadInput]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       const code = e.code;
       switch (code) {
         case "ArrowLeft":
-          setCursorX((p) => {
-            const check = checkMove(
-              shapeRef.current,
-              p - 1,
-              cursorYRef.current,
-            );
-            if (check === "valid") {
-              return p - 1;
-            } else {
-              return p;
-            }
-          });
+          handleMoveLeft();
           break;
-
         case "ArrowRight":
-          setCursorX((p) => {
-            const check = checkMove(
-              shapeRef.current,
-              p + 1,
-              cursorYRef.current,
-            );
-            if (check === "valid") {
-              return p + 1;
-            } else {
-              return p;
-            }
-          });
+          handleMoveRight();
           break;
-        case "ArrowUp": {
-          const rotatedShape = rotateClockwise(shapeRef.current.shape);
-          const currentShape = { ...shapeRef.current, shape: rotatedShape };
-
-          if (
-            checkMove(currentShape, cursorXRef.current, cursorYRef.current) ===
-            "valid"
-          ) {
-            setShape(currentShape);
-          }
+        case "ArrowUp":
+          handleRotate();
           break;
-        }
+        case "ArrowDown":
+          moveShapeDown();
+          break;
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [checkMove]);
+  }, [moveShapeDown]);
 
   useEffect(() => {
     let time;
@@ -232,17 +298,18 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
 
   return (
     <div className="w-full h-full flex gap-2">
-      <div className="flex flex-col items-center p-4">
+      <div className="flex flex-col items-center p-4 aspect-[3/7] ">
         <div className="h-[10%] w-[33%] bg-zinc-400 rounded-t"></div>
-        <div className="flex w-full h-[90%] bg-zinc-800 rounded-xl p-4">
-          <div className="grid grid-cols-10 grid-rows-20 gap-0.5 ">
-            {Array(20)
+        <div className="flex w-full h-[90%] bg-zinc-900 rounded-xl p-4 pb-8 justify-center">
+          <div className="grid grid-cols-10 grid-rows-30 gap-0.5 ">
+            {Array(30)
               .fill(0)
               .map((_, rowIndex) =>
                 Array(10)
                   .fill(0)
                   .map((_, colIndex) => {
-                    let bgColor = "bg-zinc-900";
+                    let bgColor = "bg-zinc-800";
+                    let border = "border-none border-zinc-50";
                     switch (combinedBoard[rowIndex][colIndex]) {
                       case 2:
                         bgColor = "bg-purple-500";
@@ -269,11 +336,13 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
                         bgColor = "bg-zinc-300";
                         break;
                     }
-
+                    if (rowIndex === 9 || rowIndex === 19) {
+                      border = "border-b-[1px] border-zinc-50";
+                    }
                     return (
                       <div
                         key={`${rowIndex}-${colIndex}`}
-                        className={`${bgColor} aspect-square`}
+                        className={`${bgColor} ${border} aspect-square`}
                       ></div>
                     );
                   }),
@@ -285,6 +354,12 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
         <p>Current Fee Rate: 16 sats / vByte</p>
         <p>Block Size: {(weight * 10000) / 1000000} vMB</p>
         <p>Block Value: {minedValue / 100000000} Bitcoin</p>
+        <div>
+          <p>SegWit Bonus (Full Blocks)</p>
+          {boni.map((isActive) => (
+            <FaStar fill={isActive ? "yellow" : "grey"} />
+          ))}
+        </div>
       </div>
     </div>
   );

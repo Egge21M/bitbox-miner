@@ -1,7 +1,7 @@
 export const feeRate = 16;
 export const weigthPerBlock = 1000000 / 200;
 
-export const newgrid = Array(20).fill(Array(10).fill(0));
+export const newgrid = Array(30).fill(Array(10).fill(0));
 
 export const I_SHAPE = [[1, 1, 1, 1]];
 
