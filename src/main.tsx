@@ -22,7 +22,7 @@ function generateRandomHexStrings(count: number, length: number) {
 export const randomHexStrings = generateRandomHexStrings(100, 256);
 
 createRoot(document.getElementById("root")!).render(
-  <main className="absolute inset-0">
+  <main className="absolute inset-0" id="mainWrapper">
     <App />
   </main>,
 );
