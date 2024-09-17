@@ -321,7 +321,7 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
   });
 
   return (
-    <div className="w-full h-full flex gap-2">
+    <div className="w-full h-full flex justify-center gap-2">
       <div className="flex flex-col items-center p-4 aspect-[3/7] ">
         <div className="h-[10%] w-[33%] bg-zinc-400 rounded-t"></div>
         <div className="flex w-full h-[90%] bg-zinc-900 rounded-xl p-4 pb-8 justify-center">
@@ -374,15 +374,18 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 justify-center text-left text-sm">
-        <p>Current Fee Rate: 16 sats / vByte</p>
-        <p>Block Size: {(weight * 10000) / 1000000} vMB</p>
-        <p>Block Value: {minedValue / 100000000} Bitcoin</p>
+      <div className="flex flex-col gap-4 justify-center text-left text-sm w-[50%]">
         <div>
+          <p>Block Size: {(weight * 10000) / 1000000} vMB</p>
+          <p>Block Value: {minedValue / 100000000} Bitcoin</p>
+        </div>
+        <div className="flex flex-col gap-2">
           <p>SegWit Bonus (Full Blocks)</p>
-          {boni.map((isActive) => (
-            <FaStar fill={isActive ? "yellow" : "grey"} />
-          ))}
+          <div className="flex gap-2 text-xl">
+            {boni.map((isActive) => (
+              <FaStar fill={isActive ? "yellow" : "grey"} />
+            ))}
+          </div>
         </div>
       </div>
     </div>

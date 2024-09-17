@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import EndScreen from "./EndScreen";
 import StartImage from "./StartImage";
 import Tetris from "./Tetris";
+import Instructions from "./Instructions";
 
 function App() {
   const [minedValue, setMinedValue] = useState(0);
@@ -39,9 +40,10 @@ function App() {
   }
   if (phase === "start") {
     return (
-      <div className="w-full h-full flex flex-col justify-around items-center">
+      <div className="w-full h-full flex flex-col justify-around items-center p-4">
         <StartImage />
-        <p className="text-2xl animate-pulse">PRESS ENTER TO PLAY!</p>
+        <Instructions />
+        <p className="text-xl animate-pulse">PRESS ENTER TO PLAY!</p>
       </div>
     );
   }

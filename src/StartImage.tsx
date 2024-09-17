@@ -1,7 +1,7 @@
 function StartImage() {
   return (
     <pre>
-      <code className="[font-size:0.3vw] leading-none block">
+      <code className="[font-size:0.25vw] leading-none block">
         {`                                                                                                                                                                                                                                                                                                                                                                                                                
                                                                                                                                                                                                                                                                                                                                                                                                                 
                                                                                                                                                                                                                                                                                                                                                                                                                 

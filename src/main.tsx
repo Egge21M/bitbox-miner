@@ -9,7 +9,6 @@ const emitGamepadEvent = (eventName: string) => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  console.log(e.code);
   switch (e.code) {
     case "ArrowLeft":
       emitGamepadEvent("left");
@@ -17,7 +16,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     case "ArrowRight":
       emitGamepadEvent("right");
       break;
-    case "KeyS":
+    case "KeyD":
       emitGamepadEvent("a");
       break;
     case "KeyA":
@@ -35,6 +34,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 const gamepadButtonState: boolean[] = [];
+const axisState: boolean[] = [];
+const AXIS_THRESHOLD = 0.5;
 
 window.addEventListener("keydown", handleKeyDown);
 
@@ -65,6 +66,29 @@ const pollGamepad = () => {
       }
       if (!buttonPressed && gamepadButtonState[index]) {
         gamepadButtonState[index] = false;
+      }
+    });
+    gamepad.axes.forEach((axisValue, axisIndex) => {
+      if (axisState[axisIndex] === undefined) {
+        axisState[axisIndex] = false;
+      }
+
+      if (axisValue > AXIS_THRESHOLD && !axisState[axisIndex]) {
+        if (axisIndex === 0) {
+          emitGamepadEvent("right");
+        } else if (axisIndex === 1) {
+          emitGamepadEvent("down");
+        }
+        axisState[axisIndex] = true;
+      } else if (axisValue < -AXIS_THRESHOLD && !axisState[axisIndex]) {
+        if (axisIndex === 0) {
+          emitGamepadEvent("left");
+        }
+        axisState[axisIndex] = true;
+      }
+
+      if (Math.abs(axisValue) < AXIS_THRESHOLD && axisState[axisIndex]) {
+        axisState[axisIndex] = false;
       }
     });
     const leftPressed = gamepad.axes[0] < -0.5;
