@@ -29,7 +29,6 @@ function EndScreen({ totalBitcoin, reset }: EndScreenProps) {
   }, [showLeaderboard]);
 
   function submitHander() {
-    console.log(inputRef.current?.value);
     if (inputRef.current && inputRef.current.value) {
       setLeaderboard([
         ...leaderboard,

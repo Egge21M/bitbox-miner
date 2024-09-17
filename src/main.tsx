@@ -91,13 +91,6 @@ const pollGamepad = () => {
         axisState[axisIndex] = false;
       }
     });
-    const leftPressed = gamepad.axes[0] < -0.5;
-    const rightPressed = gamepad.axes[0] > 0.5;
-    const downPressed = gamepad.axes[1] > 0.5;
-
-    if (leftPressed) emitGamepadEvent("left");
-    if (rightPressed) emitGamepadEvent("right");
-    if (downPressed) emitGamepadEvent("down");
   }
 
   requestAnimationFrame(pollGamepad);

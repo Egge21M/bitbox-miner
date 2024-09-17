@@ -22,7 +22,6 @@ export function getSize(weight: number) {
 }
 
 export function getColor(feeRate: number) {
-  console.log(feeRate);
   if (feeRate === 84) {
     return "bg-sky-600";
   }
