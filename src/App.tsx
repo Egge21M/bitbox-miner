@@ -10,6 +10,7 @@ function App() {
     "start",
   );
   const [timestamp, setTimestamp] = useState(0);
+  const [boni, setBoni] = useState([false, false, false]);
 
   function endGame() {
     setPhase("end");
@@ -47,6 +48,7 @@ function App() {
         totalBitcoin={minedValue}
         reset={reset}
         createdAt={timestamp}
+        boni={boni}
       />
     );
   }
@@ -64,6 +66,8 @@ function App() {
       setMinedValue={setMinedValue}
       minedValue={minedValue}
       endGame={endGame}
+      boni={boni}
+      setBoni={setBoni}
     />
   );
 }

@@ -50,9 +50,17 @@ type TetrisProps = {
   minedValue: number;
   setMinedValue: Dispatch<SetStateAction<number>>;
   endGame: () => void;
+  boni: boolean[];
+  setBoni: Dispatch<SetStateAction<boolean[]>>;
 };
 
-function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
+function Tetris({
+  minedValue,
+  setMinedValue,
+  endGame,
+  boni,
+  setBoni,
+}: TetrisProps) {
   const [board, setBoard] = useState(newgrid);
   const [shape, setShape] = useState(
     () => shapes[Math.floor(Math.random() * shapes.length - 1)],
@@ -62,7 +70,6 @@ function Tetris({ minedValue, setMinedValue, endGame }: TetrisProps) {
   const [round, setRound] = useState(1);
   const combinedBoard = [...board.map((row) => [...row])];
   const [weight, setWeight] = useState(0);
-  const [boni, setBoni] = useState([false, false, false]);
 
   useEffect(() => {
     const blockSize = 10;

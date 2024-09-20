@@ -1,5 +1,5 @@
 export const feeRate = 16;
-export const weigthPerBlock = 1000000 / 200;
+export const weigthPerBlock = 1000000 / 100;
 
 export const newgrid = Array(30).fill(Array(10).fill(0));
 
