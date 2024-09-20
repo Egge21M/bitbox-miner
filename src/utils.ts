@@ -1,4 +1,4 @@
-import { LeaderboardEntry } from "./types";
+import { LeaderboardEntry, SignedGameData, UnsignedGameData } from "./types";
 
 export const arr = ["w", "q", "e", "r", "t", "z", "u", "i", "o", "p"];
 const rates = [84, 132, 150, 198, 240, 275, 375, 680];
@@ -90,4 +90,25 @@ export function getPlacement(
   if (leaderboard.length < 10) {
     return leaderboard.length + 1;
   }
+}
+
+export async function signGameData(
+  gameData: UnsignedGameData,
+): Promise<SignedGameData> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(import.meta.env.VITE_SECRET_KEY);
+  const messageData = encoder.encode(JSON.stringify(gameData));
+
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: { name: "SHA-256" } },
+    false,
+    ["sign"],
+  );
+
+  const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
+
+  const encodedSig = btoa(String.fromCharCode(...new Uint8Array(signature)));
+  return { ...gameData, signature: encodedSig };
 }

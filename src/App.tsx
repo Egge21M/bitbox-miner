@@ -9,6 +9,7 @@ function App() {
   const [phase, setPhase] = useState<"start" | "building" | "mining" | "end">(
     "start",
   );
+  const [timestamp, setTimestamp] = useState(0);
 
   function endGame() {
     setPhase("end");
@@ -19,6 +20,11 @@ function App() {
     setPhase("start");
   }
 
+  useEffect(() => {
+    if (phase === "start") {
+      setTimestamp(Math.floor(Date.now() / 1000));
+    }
+  }, [phase]);
   useEffect(() => {
     function startHandler(e: CustomEvent) {
       if (e.detail === "start") {
@@ -36,7 +42,13 @@ function App() {
     };
   }, [phase]);
   if (phase === "end") {
-    return <EndScreen totalBitcoin={minedValue} reset={reset} />;
+    return (
+      <EndScreen
+        totalBitcoin={minedValue}
+        reset={reset}
+        createdAt={timestamp}
+      />
+    );
   }
   if (phase === "start") {
     return (
