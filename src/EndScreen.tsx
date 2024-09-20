@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { EventHandler, useEffect, useState } from "react";
 import GameOverBanner from "./GameOverBanner";
 import QRCode from "react-qr-code";
 import { signGameData } from "./utils";
@@ -11,6 +11,28 @@ type EndScreenProps = {
 
 function EndScreen({ totalBitcoin, reset, createdAt }: EndScreenProps) {
   const [qrValue, setQrValue] = useState("");
+  const [timesPressed, setTimesPressed] = useState(0);
+  useEffect(() => {
+    function handleStartPressed(e: CustomEvent) {
+      if (e.detail === "start") {
+        if (timesPressed === 2) {
+          reset();
+        } else {
+          setTimesPressed((p) => p + 1);
+        }
+      }
+    }
+    window.addEventListener(
+      "gamepad-pressed",
+      handleStartPressed as EventListener,
+    );
+    return () => {
+      window.removeEventListener(
+        "gamepad-pressed",
+        handleStartPressed as EventListener,
+      );
+    };
+  }, [timesPressed]);
   useEffect(() => {
     async function setupQr() {
       const signedGameData = await signGameData({
@@ -28,16 +50,21 @@ function EndScreen({ totalBitcoin, reset, createdAt }: EndScreenProps) {
   }
   return (
     <div className="flex h-full flex-col justify-around items-center">
-      <GameOverBanner />
+      <h2 className="text-[10vh]">GAME OVER!</h2>
       <div className="flex gap-8 items-center">
-        <div>
-          <p>YOU HAVE EARNED {(totalBitcoin / 100000000).toFixed(3)} BTC!</p>
+        <div className="flex flex-col gap-2">
+          <p className="text-2xl">
+            YOU HAVE EARNED {(totalBitcoin / 100000000).toFixed(3)} BTC!
+          </p>
           <p>Scan this QR code to sumbit your score!</p>
         </div>
         <div className="bg-zinc-50 p-4 rounded">
           <QRCode value={qrValue} />
         </div>
       </div>
+      <p className="animate-pulse">
+        Press START {3 - timesPressed} times to restart
+      </p>
     </div>
   );
 }
